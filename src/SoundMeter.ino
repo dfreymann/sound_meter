@@ -8,7 +8,7 @@
 // updating for installation outside
 // recompiling for latest OS
 
-// 14.26.20 
+// 4.26.20 
 // a) should have a handler for failure to upload (e.g. store values
 // in an array and upload when have access)
 // b) figure out a way to externalize wifi credentials that I can 
