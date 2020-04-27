@@ -36,7 +36,8 @@ TCPClient client;
 // Create the Timer
 elapsedMillis measurementTime;
 // and set the interval for output (or upload) in mS
-unsigned int twentySeconds = 20000; // 20000; set to 2000 for testing
+// 4.27.20 change to every minute
+unsigned int twentySeconds = 60000; // 20000; set to 2000 for testing
 
 // Define a running average of the dB measurements
 // ? define the count in terms of the output time, sort of...

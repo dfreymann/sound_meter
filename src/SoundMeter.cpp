@@ -14,7 +14,7 @@
 // updating for installation outside
 // recompiling for latest OS
 
-// 14.26.20 
+// 4.26.20 
 // a) should have a handler for failure to upload (e.g. store values
 // in an array and upload when have access)
 // b) figure out a way to externalize wifi credentials that I can 
@@ -45,7 +45,8 @@ TCPClient client;
 // Create the Timer
 elapsedMillis measurementTime;
 // and set the interval for output (or upload) in mS
-unsigned int twentySeconds = 20000; // 20000; set to 2000 for testing
+// 4.27.20 change to every minute
+unsigned int twentySeconds = 60000; // 20000; set to 2000 for testing
 
 // Define a running average of the dB measurements
 // ? define the count in terms of the output time, sort of...
