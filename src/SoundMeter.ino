@@ -8,7 +8,6 @@
 // updating for installation outside
 // recompiling for latest OS
 //
-//
 // 5.22.20 
 // the quick and dirty method of generating a running average of 
 // the dBA output used previously is (very) incorrect. 
@@ -33,8 +32,6 @@
 // c) also implement a count of # measurements 10dB above averagedB
 // and # of measurements 10dB below averagedB in the time period
 // d) also implement a measure of 'ambient' - see references
-// 
-//
 //
 // ----------------------------------------
 

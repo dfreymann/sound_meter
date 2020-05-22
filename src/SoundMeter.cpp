@@ -14,7 +14,6 @@
 // updating for installation outside
 // recompiling for latest OS
 //
-//
 // 5.22.20 
 // the quick and dirty method of generating a running average of 
 // the dBA output used previously is (very) incorrect. 
@@ -39,14 +38,12 @@
 // c) also implement a count of # measurements 10dB above averagedB
 // and # of measurements 10dB below averagedB in the time period
 // d) also implement a measure of 'ambient' - see references
-// 
-//
 //
 // ----------------------------------------
 
 void setup();
 void loop();
-#line 41 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
+#line 38 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
 #define DEBUGS                               // 4.26.20 - use of "DEBUG" introduces conflict
 
 // #include "application.h"                 // Particle Default (old) - 4.26.20 - had to comment this out 

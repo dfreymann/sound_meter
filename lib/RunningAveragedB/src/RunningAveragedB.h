@@ -5,6 +5,9 @@
 // values, so is used only to maintain an ongoing 
 // 'ambient' value in the SoundMeter.ino code
 //
+// Based on RunningAverage.cpp Verson 0.2.06 2015-mar-07
+// by Rob Tillaart
+// https://github.com/RobTillaart/Arduino/tree/master/libraries/RunningAverage
 
 #ifndef RunningAveragedB_h
 #define RunningAveragedB_h
