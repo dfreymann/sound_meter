@@ -36,20 +36,13 @@ double AveragedB::getAverage()
 {
     if (_cnt == 0) return 0;
 
-    _avg = _sum / _cnt; 
-
-    if (_avg > 0) _logby10 = log10(_avg); 
-
+    _avgpow = _sum / _cnt; 
+    if (_avgpow > 0) _logby10 = log10(_avgpow); 
+    _avg = 10 * _logby10; 
    
-    Serial.print("_cnt - ");
-    Serial.println(_cnt); 
-    Serial.print("average - "); 
-    Serial.println(_avg);
-    Serial.print("log 10 - "); 
-    Serial.println(_logby10); 
-
     clear(); 
-    return (10 * _logby10);
+
+    return (_avg);
 }
 
 

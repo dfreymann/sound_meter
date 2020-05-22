@@ -13,8 +13,6 @@ class AveragedB
 {
 public:
     AveragedB(void);
-    AveragedB(uint16_t);
-    ~AveragedB();
 
     void clear();
     void addValue(double);
@@ -30,8 +28,9 @@ protected:
     // dmf 5.22.20 
     double _by10;
     double _expby10;
-    double _avg;
+    double _avgpow; 
     double _logby10; 
+    double _avg;
 
 };
 

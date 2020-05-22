@@ -52,31 +52,15 @@ void RunningAveragedB::addValue(double value)
     if (_idx == _size) _idx = 0;  // faster than %
     if (_cnt < _size) _cnt++;
 
-    Serial.print(" _size - "); 
-    Serial.println(_size);
-    Serial.print(" _cnt -"); 
-    Serial.println(_cnt); 
-
 }
 
 // returns the average of the data-set added sofar
 double RunningAveragedB::getAverage()
 {
     if (_cnt == 0) return 0;
-    // dmf 5.22.20
+
     _avg = _sum / _cnt; 
- 
-
-
     if (_avg > 0) _logby10 = log10(_avg); 
-
-   
-    Serial.print("_cnt - ");
-    Serial.println(_cnt); 
-    Serial.print("average - "); 
-    Serial.println(_avg);
-    Serial.print("log 10 - "); 
-    Serial.println(_logby10); 
 
     return (10 * _logby10);
 }

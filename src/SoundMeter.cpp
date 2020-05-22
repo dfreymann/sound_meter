@@ -7,48 +7,54 @@
 // 9.26.18
 // dmf
 // SoundMeter code
-
+// 
 // 4.26.20 
 // running on dmf_photon_9 (labeled "P 9")
 // connected to foo_bar wifi network for the time being 
 // updating for installation outside
 // recompiling for latest OS
-
+//
+//
+// 5.22.20 
+// the quick and dirty method of generating a running average of 
+// the dBA output used previously is (very) incorrect. 
+// 5.22.20 
+// crap, found a bad bug - uint_8 (size parameter in the RunningAverage
+// library) only accomodates to 256. I was passing it 200000, silently
+// being truncated so that only the last 32 values were being included
+// in the moving average. If you try to allocate for uint_16, and send 
+// a large value, the malloc fails (returns 0). 
+// 5.22.20 
+// restructure as 'intervalAvgdB' (what previously was the 'runningAvg')
+// and also 'ambientAvgdB' (an average of averages to establish the 
+// background levels over the previous 30 minutes)
+//
+// Future - 
 // 4.26.20 
 // a) should have a handler for failure to upload (e.g. store values
 // in an array and upload when have access)
 // b) figure out a way to externalize wifi credentials that I can 
 // work with.
-
 // 5.22.20 
-// i) the quick and dirty method of generating a running average of 
-// the dBA output is (very) incorrect. writing a RunningAveragedB 
-// library and will implement proper Leq average reporting.
-// ii) also implement a count of # measurements 10dB above averagedB
+// c) also implement a count of # measurements 10dB above averagedB
 // and # of measurements 10dB below averagedB in the time period
-// iii) also implement a measure of 'ambient' - see references
+// d) also implement a measure of 'ambient' - see references
 // 
-// 5.22.20 
-// crap, found a bad bug - uint_8 (size parameter in the RunningAverage
-// code) only accomodates to 256. I was passing it 200000, and silently
-// being truncated so that only the last 32 values were being included
-// in the moving average. If you try to allocate for uint_16, the program
-// seems to just sit - I'm not going to try to debug this, a rolling 
-// average (which requires allocating indexed positions) may not be needed. 
 //
 //
 // ----------------------------------------
 
 void setup();
 void loop();
-#line 36 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
+#line 41 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
 #define DEBUGS                               // 4.26.20 - use of "DEBUG" introduces conflict
 
 // #include "application.h"                 // Particle Default (old) - 4.26.20 - had to comment this out 
 #include "math.h"                           // For Some Reason...
 // -----
 #include "elapsedMillis.h"                  // Elapsed Timer
-#include "RunningAveragedB.h"                 // Moving Average
+#include "AveragedB.h"                      // Interval Average
+#include "RunningAveragedB.h"               // running average
 #include "ThingSpeak.h"                     // Nice! Thingspeak has a library
 
 // externalize API keys
@@ -62,19 +68,21 @@ elapsedMillis measurementTime;
 // and set the interval for output (or upload) in mS
 uint16_t twentySeconds = 20000; // 20000; set to 2000 for testing
 
-// Define a running average of the dB measurements
+// Define a interval average of the dB measurements
 // ? define the count in terms of the output time, sort of...
 int runningAvgCount = twentySeconds; // e.g. if 1 mS loop(), which
 // actually may be ~ballpark for running in automatic mode (google)
-RunningAveragedB runningAvgdB(twentySeconds);
+AveragedB intervalAvgdB;
+
+// Use a running average to track ambient levels
+// 256 values will track ~30 minutes if using 20s intervals
+RunningAveragedB ambientAvgdB(255); 
 
 // Define the voltage input pin
 int dBVoltagePin = A0;
 // Define the conversion from AnalogRead counts to dB
 float dBAnalogConversion = 100 * (3.3 / 4096);
 float maxdB = 0;
-
-int icount = 0; 
 
 // ----------------------------------------
 void setup() {
@@ -89,8 +97,8 @@ void setup() {
   // Setup for Thingspeak
   ThingSpeak.begin(client);
 
-  // initialize the running average to 0
-  runningAvgdB.clear();
+  // initialize the interval average to 0
+  intervalAvgdB.clear();
 
   // Do not need to declare the analog read pin:
     // "Note: you do not need to set the pinMode() with
@@ -128,19 +136,13 @@ void loop() {
 
   if (dBMeasurement > maxdB) maxdB = dBMeasurement;
 
-  // Maintain a moving average of the sound level
-  runningAvgdB.addValue(dBMeasurement);
-
-  icount++;
+  // Accumulate an average of the sound level
+  intervalAvgdB.addValue(dBMeasurement);
 
   if (measurementTime > twentySeconds) {
 
     // When time to upload, generate the average
-    float avgdB = runningAvgdB.getAverage();
-
-    Serial.print(" number values sent ");
-    Serial.println(icount); 
-    icount = 0; 
+    float avgdB = intervalAvgdB.getAverage();
 
     #ifdef DEBUGS
       Serial.print(" avgdB ");
@@ -148,6 +150,16 @@ void loop() {
       Serial.print(" maxdB ");
       Serial.println(maxdB);
     #endif
+
+    // add to the running average 
+    ambientAvgdB.addValue(avgdB); 
+    // and return the accumulated ambient value
+    float ambientdB = ambientAvgdB.getAverage(); 
+
+    #ifdef DEBUGS
+      Serial.print(" ambient "); 
+      Serial.println(ambientdB); 
+    #endif 
 
     // prepare the information for upload [**** TO DO *****]
     // Note that the field values must be float (not unsigned long).
