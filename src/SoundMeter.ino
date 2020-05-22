@@ -30,8 +30,7 @@
 // work with.
 // 5.22.20 
 // c) also implement a count of # measurements 10dB above averagedB
-// and # of measurements 10dB below averagedB in the time period
-// d) also implement a measure of 'ambient' - see references
+// and # of measurements 10dB below averagedB (ambient) in the time period
 //
 // ----------------------------------------
 
