@@ -36,14 +36,13 @@
 // work with.
 // 5.22.20 
 // c) also implement a count of # measurements 10dB above averagedB
-// and # of measurements 10dB below averagedB in the time period
-// d) also implement a measure of 'ambient' - see references
+// and # of measurements 10dB below averagedB (ambient) in the time period
 //
 // ----------------------------------------
 
 void setup();
 void loop();
-#line 38 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
+#line 37 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
 #define DEBUGS                               // 4.26.20 - use of "DEBUG" introduces conflict
 
 // #include "application.h"                 // Particle Default (old) - 4.26.20 - had to comment this out 
