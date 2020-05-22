@@ -14,11 +14,14 @@
 // the dBA output used previously is (very) incorrect. 
 // 5.22.20 
 // crap, found a bad bug - uint_8 (size parameter in the RunningAverage
-// code) only accomodates to 256. I was passing it 200000, and silently
+// library) only accomodates to 256. I was passing it 200000, silently
 // being truncated so that only the last 32 values were being included
 // in the moving average. If you try to allocate for uint_16, and send 
-// a large value, the malloc fails (returns 0). A rolling average may 
-// not be needed, so revise for that. 
+// a large value, the malloc fails (returns 0). 
+// 5.22.20 
+// restructure as 'intervalAvgdB' (what previously was the 'runningAvg')
+// and also 'ambientAvgdB' (an average of averages to establish the 
+// background levels over the previous 30 minutes)
 //
 // Future - 
 // 4.26.20 
@@ -41,7 +44,8 @@
 #include "math.h"                           // For Some Reason...
 // -----
 #include "elapsedMillis.h"                  // Elapsed Timer
-#include "RunningAveragedB.h"                 // Moving Average
+#include "AveragedB.h"                      // Interval Average
+#inclued "RunningAveragedB.h"               // running average
 #include "ThingSpeak.h"                     // Nice! Thingspeak has a library
 
 // externalize API keys
@@ -59,7 +63,11 @@ uint16_t twentySeconds = 20000; // 20000; set to 2000 for testing
 // ? define the count in terms of the output time, sort of...
 int runningAvgCount = twentySeconds; // e.g. if 1 mS loop(), which
 // actually may be ~ballpark for running in automatic mode (google)
-RunningAveragedB runningAvgdB(twentySeconds);
+AveragedB intervalAvgdB();
+
+// Use a running average to track ambient levels
+// 256 values will track ~30 minutes if using 20s intervals
+RunningAveragedB ambientAvgdB(256); 
 
 // Define the voltage input pin
 int dBVoltagePin = A0;
@@ -83,7 +91,7 @@ void setup() {
   ThingSpeak.begin(client);
 
   // initialize the running average to 0
-  runningAvgdB.clear();
+  intervalAvgdB.clear();
 
   // Do not need to declare the analog read pin:
     // "Note: you do not need to set the pinMode() with
@@ -122,14 +130,14 @@ void loop() {
   if (dBMeasurement > maxdB) maxdB = dBMeasurement;
 
   // Maintain a moving average of the sound level
-  runningAvgdB.addValue(dBMeasurement);
+  intervalAvgdB.addValue(dBMeasurement);
 
   icount++;
 
   if (measurementTime > twentySeconds) {
 
     // When time to upload, generate the average
-    float avgdB = runningAvgdB.getAverage();
+    float avgdB = intervalAvgdB.getAverage();
 
     Serial.print(" number values sent ");
     Serial.println(icount); 
