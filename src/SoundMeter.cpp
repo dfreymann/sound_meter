@@ -161,6 +161,7 @@ void loop() {
     // Note that the field values must be float (not unsigned long).
     ThingSpeak.setField(1,avgdB);
     ThingSpeak.setField(2,maxdB);
+    ThingSpeak.setField(3,ambientdB);
 
     // Write the fields all at once.
     ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
