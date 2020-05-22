@@ -20,20 +20,27 @@
 // b) figure out a way to externalize wifi credentials that I can 
 // work with.
 
+// 5.22.20 
+// i) the quick and dirty method of generating a running average of 
+// the dBA output is (very) incorrect. writing a RunningAveragedB 
+// library and will implement proper Leq average reporting.
+// ii) also implement a count of # measurements 10dB above averagedB
+// and # of measurements 10dB below averagedB in the time period
+// iii) also implement a measure of 'ambient' - see references
 //
 //
 // ----------------------------------------
 
 void setup();
 void loop();
-#line 21 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
+#line 28 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
 #define DEBUGS                               // 4.26.20 - use of "DEBUG" introduces conflict
 
 // #include "application.h"                 // Particle Default (old) - 4.26.20 - had to comment this out 
 #include "math.h"                           // For Some Reason...
 // -----
 #include "elapsedMillis.h"                  // Elapsed Timer
-#include "RunningAverage.h"                 // Moving Average
+#include "RunningAveragedB.h"                 // Moving Average
 #include "ThingSpeak.h"                     // Nice! Thingspeak has a library
 
 // externalize API keys
@@ -51,7 +58,7 @@ unsigned int twentySeconds = 20000; // 20000; set to 2000 for testing
 // ? define the count in terms of the output time, sort of...
 int runningAvgCount = twentySeconds; // e.g. if 1 mS loop(), which
 // actually may be ~ballpark for running in automatic mode (google)
-RunningAverage runningAvgdB(twentySeconds);
+RunningAveragedB runningAvgdB(twentySeconds);
 
 // Define the voltage input pin
 int dBVoltagePin = A0;
