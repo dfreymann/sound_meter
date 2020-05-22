@@ -27,13 +27,21 @@
 // ii) also implement a count of # measurements 10dB above averagedB
 // and # of measurements 10dB below averagedB in the time period
 // iii) also implement a measure of 'ambient' - see references
+// 
+// 5.22.20 
+// crap, found a bad bug - uint_8 (size parameter in the RunningAverage
+// code) only accomodates to 256. I was passing it 200000, and silently
+// being truncated so that only the last 32 values were being included
+// in the moving average. If you try to allocate for uint_16, the program
+// seems to just sit - I'm not going to try to debug this, a rolling 
+// average (which requires allocating indexed positions) may not be needed. 
 //
 //
 // ----------------------------------------
 
 void setup();
 void loop();
-#line 28 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
+#line 36 "/Users/freymann/Dropbox/Electronics/_CODE/ParticleWorkbench/SoundMeter/src/SoundMeter.ino"
 #define DEBUGS                               // 4.26.20 - use of "DEBUG" introduces conflict
 
 // #include "application.h"                 // Particle Default (old) - 4.26.20 - had to comment this out 
@@ -52,7 +60,7 @@ TCPClient client;
 // Create the Timer
 elapsedMillis measurementTime;
 // and set the interval for output (or upload) in mS
-unsigned int twentySeconds = 20000; // 20000; set to 2000 for testing
+uint16_t twentySeconds = 20000; // 20000; set to 2000 for testing
 
 // Define a running average of the dB measurements
 // ? define the count in terms of the output time, sort of...
@@ -65,6 +73,8 @@ int dBVoltagePin = A0;
 // Define the conversion from AnalogRead counts to dB
 float dBAnalogConversion = 100 * (3.3 / 4096);
 float maxdB = 0;
+
+int icount = 0; 
 
 // ----------------------------------------
 void setup() {
@@ -121,10 +131,16 @@ void loop() {
   // Maintain a moving average of the sound level
   runningAvgdB.addValue(dBMeasurement);
 
+  icount++;
+
   if (measurementTime > twentySeconds) {
 
     // When time to upload, generate the average
     float avgdB = runningAvgdB.getAverage();
+
+    Serial.print(" number values sent ");
+    Serial.println(icount); 
+    icount = 0; 
 
     #ifdef DEBUGS
       Serial.print(" avgdB ");

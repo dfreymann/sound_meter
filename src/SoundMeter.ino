@@ -1,26 +1,36 @@
 // 9.26.18
 // dmf
 // SoundMeter code
-
+// 
 // 4.26.20 
 // running on dmf_photon_9 (labeled "P 9")
 // connected to foo_bar wifi network for the time being 
 // updating for installation outside
 // recompiling for latest OS
-
+//
+//
+// 5.22.20 
+// the quick and dirty method of generating a running average of 
+// the dBA output used previously is (very) incorrect. 
+// 5.22.20 
+// crap, found a bad bug - uint_8 (size parameter in the RunningAverage
+// code) only accomodates to 256. I was passing it 200000, and silently
+// being truncated so that only the last 32 values were being included
+// in the moving average. If you try to allocate for uint_16, and send 
+// a large value, the malloc fails (returns 0). A rolling average may 
+// not be needed, so revise for that. 
+//
+// Future - 
 // 4.26.20 
 // a) should have a handler for failure to upload (e.g. store values
 // in an array and upload when have access)
 // b) figure out a way to externalize wifi credentials that I can 
 // work with.
-
 // 5.22.20 
-// i) the quick and dirty method of generating a running average of 
-// the dBA output is (very) incorrect. writing a RunningAveragedB 
-// library and will implement proper Leq average reporting.
-// ii) also implement a count of # measurements 10dB above averagedB
+// c) also implement a count of # measurements 10dB above averagedB
 // and # of measurements 10dB below averagedB in the time period
-// iii) also implement a measure of 'ambient' - see references
+// d) also implement a measure of 'ambient' - see references
+// 
 //
 //
 // ----------------------------------------
@@ -43,7 +53,7 @@ TCPClient client;
 // Create the Timer
 elapsedMillis measurementTime;
 // and set the interval for output (or upload) in mS
-unsigned int twentySeconds = 20000; // 20000; set to 2000 for testing
+uint16_t twentySeconds = 20000; // 20000; set to 2000 for testing
 
 // Define a running average of the dB measurements
 // ? define the count in terms of the output time, sort of...
@@ -56,6 +66,8 @@ int dBVoltagePin = A0;
 // Define the conversion from AnalogRead counts to dB
 float dBAnalogConversion = 100 * (3.3 / 4096);
 float maxdB = 0;
+
+int icount = 0; 
 
 // ----------------------------------------
 void setup() {
@@ -112,10 +124,16 @@ void loop() {
   // Maintain a moving average of the sound level
   runningAvgdB.addValue(dBMeasurement);
 
+  icount++;
+
   if (measurementTime > twentySeconds) {
 
     // When time to upload, generate the average
     float avgdB = runningAvgdB.getAverage();
+
+    Serial.print(" number values sent ");
+    Serial.println(icount); 
+    icount = 0; 
 
     #ifdef DEBUGS
       Serial.print(" avgdB ");

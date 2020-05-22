@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-RunningAveragedB::RunningAveragedB(uint8_t size)
+RunningAveragedB::RunningAveragedB(uint16_t size)
 {
     _size = size;
     _ar = (double*) malloc(_size * sizeof(double));
@@ -51,7 +51,7 @@ void RunningAveragedB::clear()
     _cnt = 0;
     _idx = 0;
     _sum = 0.0;
-    for (uint8_t i = 0; i< _size; i++)
+    for (uint16_t i = 0; i< _size; i++)
     {
         _ar[i] = 0.0; // keeps addValue simple
     }
@@ -73,6 +73,12 @@ void RunningAveragedB::addValue(double value)
     _idx++;
     if (_idx == _size) _idx = 0;  // faster than %
     if (_cnt < _size) _cnt++;
+
+    Serial.print(" _size - "); 
+    Serial.println(_size);
+    Serial.print(" _cnt -"); 
+    Serial.println(_cnt); 
+
 }
 
 // returns the average of the data-set added sofar
@@ -81,7 +87,19 @@ double RunningAveragedB::getAverage()
     if (_cnt == 0) return 0;
     // dmf 5.22.20
     _avg = _sum / _cnt; 
+ 
+
+
     if (_avg > 0) _logby10 = log10(_avg); 
+
+   
+    Serial.print("_cnt - ");
+    Serial.println(_cnt); 
+    Serial.print("average - "); 
+    Serial.println(_avg);
+    Serial.print("log 10 - "); 
+    Serial.println(_logby10); 
+
     return (10 * _logby10);
 }
 

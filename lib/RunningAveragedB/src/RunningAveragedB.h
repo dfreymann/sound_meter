@@ -33,7 +33,7 @@ class RunningAveragedB
 {
 public:
     RunningAveragedB(void);
-    RunningAveragedB(uint8_t);
+    RunningAveragedB(uint16_t);
     ~RunningAveragedB();
 
     void clear();
@@ -41,13 +41,13 @@ public:
 
     double getAverage();
 
-    uint8_t getSize() { return _size; }
-    uint8_t getCount() { return _cnt; }
+    uint16_t getSize() { return _size; }
+    uint16_t getCount() { return _cnt; }
 
 protected:
-    uint8_t _size;
-    uint8_t _cnt;
-    uint8_t _idx;
+    uint16_t _size;
+    uint16_t _cnt;
+    uint16_t _idx;
     double   _sum;
     double * _ar;
 
