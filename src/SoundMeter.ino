@@ -62,8 +62,10 @@ int runningAvgCount = twentySeconds; // e.g. if 1 mS loop(), which
 AveragedB intervalAvgdB;
 
 // Use a running average to track ambient levels
-// 256 values will track ~30 minutes if using 20s intervals
-RunningAveragedB ambientAvgdB(255); 
+// 256 values will track ~90 minutes if using 20s intervals
+// 5.23.20 255 works well, but see persistence after loud
+// events. try 90 for a ~30 minute window. 
+RunningAveragedB ambientAvgdB(90); 
 
 // Define the voltage input pin
 int dBVoltagePin = A0;
